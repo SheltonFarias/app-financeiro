@@ -10,6 +10,9 @@
       "bundleIdentifier": "com.farias.financeiro",
       "supportsTablet": false
     },
+    "android": {
+      "package": "com.farias.financeiro"
+    },
     "plugins": [
       "expo-router",
       "expo-secure-store"
