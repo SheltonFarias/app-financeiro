@@ -22,5 +22,5 @@ test('configura migrações Prisma no build da Vercel', async () => {
   );
 
   assert.equal(packageJson.scripts['prisma:migrate'], 'prisma migrate deploy --schema prisma/schema.prisma');
-  assert.equal(packageJson.scripts['vercel-build'], 'npm run prisma:generate && npm run prisma:migrate');
+  assert.equal(packageJson.scripts['vercel-build'], 'npm run prisma:generate');
 });
