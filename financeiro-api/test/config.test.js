@@ -11,3 +11,17 @@ test('carrega configurações com valores seguros', () => {
   assert.equal(config.port, 4010);
   assert.equal(config.corsOrigins.has('https://app.exemplo.com'), true);
 });
+
+test('aceita valores com aspas externas de provedores de ambiente', () => {
+  const config = loadConfig({
+    DATABASE_URL: '"postgresql://usuario:senha@db.exemplo.com:5432/postgres"',
+    CORS_ORIGINS: '"https://web.exemplo.com"',
+    AUTH_USER: '"admin"',
+    JWT_SECRET: '"segredo"',
+  });
+
+  assert.equal(config.databaseUrl, 'postgresql://usuario:senha@db.exemplo.com:5432/postgres');
+  assert.equal(config.corsOrigins.has('https://web.exemplo.com'), true);
+  assert.equal(config.auth.username, 'admin');
+  assert.equal(config.auth.jwtSecret, 'segredo');
+});

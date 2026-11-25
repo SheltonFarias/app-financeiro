@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
-import { createServer } from '../src/server.js';
+import { createServer } from '../src/financeiro-service.js';
 
 async function start(server) {
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));

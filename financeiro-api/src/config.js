@@ -1,6 +1,14 @@
 const DEFAULT_PORT = 3001;
 const DEFAULT_TIMEOUT_MS = 15_000;
 
+function unwrapEnvValue(value) {
+  const trimmed = (value ?? '').trim();
+  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
 function parsePositiveInt(value, fallback) {
   const parsed = Number.parseInt(value ?? '', 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
@@ -8,7 +16,7 @@ function parsePositiveInt(value, fallback) {
 
 function parseOrigins(value) {
   return new Set(
-    (value ?? '')
+    unwrapEnvValue(value)
       .split(',')
       .map((origin) => origin.trim())
       .filter(Boolean),
@@ -24,12 +32,13 @@ function parseUrl(value, name) {
 }
 
 function parseDatabaseUrl(value) {
-  if (!value) return '';
-  const url = parseUrl(value, 'DATABASE_URL');
+  const normalizedValue = unwrapEnvValue(value);
+  if (!normalizedValue) return '';
+  const url = parseUrl(normalizedValue, 'DATABASE_URL');
   if (!['postgres:', 'postgresql:'].includes(url.protocol)) {
     throw new Error('DATABASE_URL deve usar o protocolo postgres:// ou postgresql://.');
   }
-  return value;
+  return normalizedValue;
 }
 
 // O Next.js aceita `\$` em arquivos .env, enquanto o dotenv preserva a barra.
@@ -45,10 +54,10 @@ export function loadConfig(env = process.env) {
     databaseUrl: parseDatabaseUrl(env.DATABASE_URL),
     corsOrigins: parseOrigins(env.CORS_ORIGINS),
     auth: {
-      passwordHash: normalizePasswordHash(env.AUTH_PASSWORD_HASH),
-      jwtSecret: env.JWT_SECRET ?? '',
-      jwtExpiresIn: env.JWT_EXPIRES_IN || '8h',
-      username: env.AUTH_USER || 'admin',
+      passwordHash: normalizePasswordHash(unwrapEnvValue(env.AUTH_PASSWORD_HASH)),
+      jwtSecret: unwrapEnvValue(env.JWT_SECRET),
+      jwtExpiresIn: unwrapEnvValue(env.JWT_EXPIRES_IN) || '8h',
+      username: unwrapEnvValue(env.AUTH_USER) || 'admin',
     },
   };
 }
